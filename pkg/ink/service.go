@@ -1,5 +1,7 @@
 package ink
 
+import "fmt"
+
 type Repository interface {
 	AddInk(Ink) error
 	GetInk(int64) (*Ink, error)
@@ -21,6 +23,12 @@ func NewService(r Repository) Service {
 }
 
 func (s *service) AddInk(ink Ink) error {
+	if ink.ColorFamily == 0 {
+		return fmt.Errorf("colorFamily is required")
+	}
+	if ink.Name == "" {
+		return fmt.Errorf("namme is required")
+	}
 	return s.repo.AddInk(ink)
 }
 
