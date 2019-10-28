@@ -16,7 +16,7 @@ type Service interface {
 	GetSessionToken(username string, password string) (token string, err error)
 	GetSessionTokenFromRefreshToken(refreshToken string) (token string, err error)
 	IsTokenValid(token string) (bool, error)
-	AddNewUser(username string, password string)
+	AddNewUser(username string, password string) error
 }
 
 type service struct {
@@ -36,11 +36,14 @@ func (s *service) GetSessionToken(username string, password string) (token strin
 	if err != nil {
 		return "", err
 	}
-	hash := hashPassword(password)
-	if hash != user.PasswordHash {
+	ok, err := checkPlainTextMatchesHash(password, user.PasswordHash)
+	if err != nil {
+		return "", err
+	}
+	if !ok {
 		return "", errors.New("password is incorrect")
 	}
-	token = makeSessionToken()
+	token = newSessionToken()
 	s.cache.StoreToken(token, user.Id)
 	return token, nil
 }
@@ -53,10 +56,15 @@ func (s *service) IsTokenValid(token string) (bool, error) {
 	return s.cache.IsTokenValid()
 }
 
-func (s *service) AddNewUser(username string, password string) {
+func (s *service) AddNewUser(username string, password string) error {
+	hash, err := newPasswordHash(password)
+	if err != nil {
+		return err
+	}
 	user := User{
 		Username:     username,
-		PasswordHash: hashPassword(password),
+		PasswordHash: hash,
 	}
 	s.repo.AddUser(user)
+	return nil
 }
