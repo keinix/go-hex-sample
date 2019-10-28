@@ -2,7 +2,7 @@ package psql
 
 import (
 	"fmt"
-	"go-hex-sample/pkg/ink"
+	"go-hex-sample/pkg/domain/ink"
 )
 
 type inkRepository struct {

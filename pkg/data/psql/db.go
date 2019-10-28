@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"go-hex-sample/pkg/ink"
+	"go-hex-sample/pkg/domain/ink"
+	"go-hex-sample/pkg/domain/login"
 )
 
 const (
@@ -20,7 +21,7 @@ func Migrate() error {
 	if err != nil {
 		return err
 	}
-	db.AutoMigrate(&ink.Ink{})
+	db.AutoMigrate(&ink.Ink{}, &login.User{})
 	if err := db.Close(); err != nil {
 		return err
 	}
