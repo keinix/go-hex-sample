@@ -24,6 +24,8 @@ func main() {
 	loginService := login.NewService(loginRepo, tokenCache)
 	loginHandler := handler.NewLoginHandler(loginService)
 
+	_ = loginService.AddNewUser("Keinix", "zelda123")
+
 	r := gin.Default()
 	r.Use(middlewear.HandleError())
 

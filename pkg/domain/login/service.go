@@ -1,6 +1,9 @@
 package login
 
-import "errors"
+import (
+	"errors"
+	"log"
+)
 
 type Repository interface {
 	GetUser(username string) (*User, error)
@@ -58,6 +61,7 @@ func (s *service) IsTokenValid(token string) (bool, error) {
 
 func (s *service) AddNewUser(username string, password string) error {
 	hash, err := newPasswordHash(password)
+	log.Println(hash)
 	if err != nil {
 		return err
 	}
