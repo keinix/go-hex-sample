@@ -2,7 +2,8 @@ package login
 
 import (
 	"errors"
-	"log"
+	"fmt"
+	"go-hex-sample/pkg/domain/crypto"
 )
 
 type Repository interface {
@@ -39,14 +40,17 @@ func (s *service) GetSessionToken(username string, password string) (token strin
 	if err != nil {
 		return "", err
 	}
-	ok, err := checkPlainTextMatchesHash(password, user.PasswordHash)
+	ok, err := crypto.CheckPlainTextMatchesHash(password, user.PasswordHash)
 	if err != nil {
 		return "", err
 	}
 	if !ok {
 		return "", errors.New("password is incorrect")
 	}
-	token = newSessionToken()
+	token, err = crypto.NewSessionToken()
+	if err != nil {
+		return "", fmt.Errorf("error creating new token: %w", err)
+	}
 	s.cache.StoreToken(token, user.Id)
 	return token, nil
 }
@@ -60,8 +64,7 @@ func (s *service) IsTokenValid(token string) (bool, error) {
 }
 
 func (s *service) AddNewUser(username string, password string) error {
-	hash, err := newPasswordHash(password)
-	log.Println(hash)
+	hash, err := crypto.NewPasswordHash(password)
 	if err != nil {
 		return err
 	}

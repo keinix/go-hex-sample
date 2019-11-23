@@ -1,6 +1,9 @@
-package login
+package crypto_test
 
-import "testing"
+import (
+	"go-hex-sample/pkg/domain/crypto"
+	"testing"
+)
 
 func TestPasswordMatch(t *testing.T) {
 	tables := []struct {
@@ -13,12 +16,12 @@ func TestPasswordMatch(t *testing.T) {
 		{name: "different passwords don't match", password1: "zelda123", password2: "link123", expected: false},
 	}
 	for _, table := range tables {
-		hash, err := newPasswordHash(table.password1)
+		hash, err := crypto.NewPasswordHash(table.password1)
 		if err != nil {
 			t.Errorf("error in test case: %v", err)
 			t.FailNow()
 		}
-		match, err := checkPlainTextMatchesHash(table.password2, hash)
+		match, err := crypto.CheckPlainTextMatchesHash(table.password2, hash)
 		if err != nil {
 			t.Errorf("error in test case: %v", err)
 			t.FailNow()
@@ -31,5 +34,5 @@ func TestPasswordMatch(t *testing.T) {
 }
 
 func BenchmarkNewPasswordHash(b *testing.B) {
-	_, _ = newPasswordHash("helloWorld1%^&#)NIOEIFH))(@*!#&*)(#*JDJOSOIJFIABUASODIIBASDI)@(*)*$#(*")
+	_, _ = crypto.NewPasswordHash("helloWorld1%^&#)NIOEIFH))(@*!#&*)(#*JDJOSOIJFIABUASODIIBASDI)@(*)*$#(*")
 }

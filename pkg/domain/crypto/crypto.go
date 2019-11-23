@@ -1,4 +1,4 @@
-package login
+package crypto
 
 import (
 	"crypto/rand"
@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/argon2"
 	"strings"
 )
@@ -26,7 +27,7 @@ var p = &params{
 	keyLength:   512,
 }
 
-func newPasswordHash(password string) (string, error) {
+func NewPasswordHash(password string) (string, error) {
 	salt, err := generateSalt(p.saltLength)
 	if err != nil {
 		return "", err
@@ -48,8 +49,8 @@ func generateSalt(n uint32) ([]byte, error) {
 // convert the hash to a format that has the necessary information
 // for the hash to be replicated given the same password input
 func encodeHash(salt []byte, hash []byte) string {
-	b64Hash := base64.RawStdEncoding.EncodeToString(hash)
 	b64Salt := base64.RawStdEncoding.EncodeToString(salt)
+	b64Hash := base64.RawStdEncoding.EncodeToString(hash)
 	return fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s",
 		argon2.Version, p.memory, p.iterations, p.parallelism, b64Salt, b64Hash)
 }
@@ -85,7 +86,7 @@ func decodeHash(encodedHash string) (p *params, salt []byte, hash []byte, err er
 	return p, salt, hash, nil
 }
 
-func checkPlainTextMatchesHash(plainText string, encodedHash string) (bool, error) {
+func CheckPlainTextMatchesHash(plainText string, encodedHash string) (bool, error) {
 	p, salt, hash, err := decodeHash(encodedHash)
 	if err != nil {
 		return false, err
@@ -97,6 +98,10 @@ func checkPlainTextMatchesHash(plainText string, encodedHash string) (bool, erro
 	return true, nil
 }
 
-func newSessionToken() string {
-	panic("implement")
+func NewSessionToken() (string, error) {
+	token, err := uuid.NewRandom()
+	if err != nil {
+		return "", err
+	}
+	return token.String(), nil
 }
