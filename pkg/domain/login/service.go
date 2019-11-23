@@ -12,8 +12,8 @@ type Repository interface {
 }
 
 type TokenCache interface {
-	IsTokenValid() (bool, error)
-	StoreToken(token string, userId int64)
+	IsTokenValid(token string) (bool, error)
+	StoreToken(token string, userId int64) error
 }
 
 type Service interface {
@@ -51,7 +51,10 @@ func (s *service) GetSessionToken(username string, password string) (token strin
 	if err != nil {
 		return "", fmt.Errorf("error creating new token: %w", err)
 	}
-	s.cache.StoreToken(token, user.Id)
+	err = s.cache.StoreToken(token, user.Id)
+	if err != nil {
+		return "", fmt.Errorf("error storing token %w", err)
+	}
 	return token, nil
 }
 
@@ -60,7 +63,7 @@ func (s *service) GetSessionTokenFromRefreshToken(refreshToken string) (token st
 }
 
 func (s *service) IsTokenValid(token string) (bool, error) {
-	return s.cache.IsTokenValid()
+	return s.cache.IsTokenValid(token)
 }
 
 func (s *service) AddNewUser(username string, password string) error {

@@ -2,7 +2,7 @@ package login_test
 
 import (
 	"go-hex-sample/pkg/domain/login"
-	"go-hex-sample/pkg/domain/mock"
+	"go-hex-sample/pkg/mock"
 	"testing"
 )
 
