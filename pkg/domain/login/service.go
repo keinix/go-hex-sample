@@ -8,7 +8,7 @@ import (
 
 type Repository interface {
 	GetUser(username string) (*User, error)
-	AddUser(user User)
+	AddUser(user User) error
 }
 
 type TokenCache interface {
@@ -75,6 +75,9 @@ func (s *service) AddNewUser(username string, password string) error {
 		Username:     username,
 		PasswordHash: hash,
 	}
-	s.repo.AddUser(user)
+	err = s.repo.AddUser(user)
+	if err != nil {
+		return fmt.Errorf("error adding user: %w", err)
+	}
 	return nil
 }

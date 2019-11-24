@@ -29,7 +29,8 @@ func (m *mockLoginRepository) GetUser(username string) (*login.User, error) {
 	return &user, nil
 }
 
-func (m *mockLoginRepository) AddUser(user login.User) {
+func (m *mockLoginRepository) AddUser(user login.User) error {
 	m.AddUserCallCount++
 	m.users = append(m.users, user)
+	return nil
 }

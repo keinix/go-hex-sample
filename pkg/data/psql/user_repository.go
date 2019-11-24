@@ -27,6 +27,18 @@ func (r *userRepository) GetUser(username string) (*login.User, error) {
 	return &result, nil
 }
 
-func (r *userRepository) AddUser(user login.User) {
-
+func (r *userRepository) AddUser(user login.User) error {
+	db, err := openDb()
+	if err != nil {
+		return fmt.Errorf("error connecting to db: %v", err)
+	}
+	ok := db.Where("username = ?", user.Username).RecordNotFound()
+	if !ok {
+		return fmt.Errorf("user with username '%v' already exists", user.Username)
+	}
+	db.Save(&user)
+	if err := db.Close(); err != nil {
+		return err
+	}
+	return nil
 }
