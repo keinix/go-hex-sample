@@ -24,15 +24,18 @@ func main() {
 	loginService := login.NewService(loginRepo, tokenCache)
 	loginHandler := handler.NewLoginHandler(loginService)
 
-	_ = loginService.AddNewUser("Keinix", "zelda123")
-
 	r := gin.Default()
 	r.Use(middlewear.HandleError())
-
-	r.GET("/ink", inkHandler.Get)
-	r.POST("/ink", inkHandler.Add)
-	r.GET("/inks", inkHandler.GetAll)
 	r.POST("/login", loginHandler.Login)
+
+	basicAuth := r.Group("/")
+	basicAuth.Use(middlewear.AuthRequired(tokenCache))
+	{
+		basicAuth.GET("/ink", inkHandler.Get)
+		basicAuth.POST("/ink", inkHandler.Add)
+		basicAuth.GET("/inks", inkHandler.GetAll)
+	}
+
 	err := r.Run(":8080")
 	if err != nil {
 		log.Panicf("could not start router %v", err)
